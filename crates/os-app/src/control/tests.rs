@@ -70,7 +70,7 @@ fn every_command_undoes_and_redoes() {
         json!({"op": "set_main_pitch", "cents": -300}),
         json!({"op": "set_time_signature", "numerator": 3, "denominator": 4}),
         json!({"op": "set_info", "title": "Song", "author": "Me"}),
-        json!({"op": "set_channel", "channel": kick, "name": "Big kick", "color": "#ff8000", "volume": 0.5, "pan": -0.25, "pitch": 100, "track": ins2}),
+        json!({"op": "set_channel", "channel": kick, "name": "Big kick", "color": "#ff8000", "volume": 0.5, "pan": -0.25, "pitch": 100, "track": ins2, "mono": true, "porta": true, "slide": 0.8}),
         json!({"op": "load_sample", "channel": clap, "path": "/no/such/folder/snare.wav"}),
         json!({"op": "set_track", "track": ins1, "name": "Drums", "color": "#102030", "volume": 0.6, "pan": 0.5, "stereo": -0.5, "polarity": true, "swap": true, "effects_enabled": false}),
         json!({"op": "set_send", "from": ins1, "to": ins2, "level": 0.5}),

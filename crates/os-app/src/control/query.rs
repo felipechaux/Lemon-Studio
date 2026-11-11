@@ -50,6 +50,9 @@ pub fn project(s: &State) -> Value {
                 "pitch": c.pitch_cents,
                 "enabled": c.enabled,
                 "track": track_id(p, c.mixer_track),
+                "mono": c.misc.mono,
+                "porta": c.misc.porta,
+                "slide": c.misc.slide,
             })
         })
         .collect();

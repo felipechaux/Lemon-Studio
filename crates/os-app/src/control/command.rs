@@ -59,7 +59,8 @@ pub enum Command {
     /// The channel moves to rack row `row` (0 = top).
     MoveChannel { channel: u32, row: usize },
     /// Each setting given is set: name (empty = the default name), colour (`#rrggbb`, empty = the default), volume
-    /// 0..=1 (0.78125 = the default), pan -1..=1, pitch in cents, enabled (the rack's mute light), mixer track (an id).
+    /// 0..=1 (0.78125 = the default), pan -1..=1, pitch in cents, enabled (the rack's mute light), mixer track (an id),
+    /// and the Misc tab's mono, portamento and slide time knob (0..=1; spec: audio/note-rules.md).
     SetChannel {
         channel: u32,
         #[serde(default)]
@@ -76,6 +77,12 @@ pub enum Command {
         enabled: Option<bool>,
         #[serde(default)]
         track: Option<u32>,
+        #[serde(default)]
+        mono: Option<bool>,
+        #[serde(default)]
+        porta: Option<bool>,
+        #[serde(default)]
+        slide: Option<f64>,
     },
     /// A sample file into a sampler channel (empty: none).
     LoadSample { channel: u32, path: String },
@@ -799,13 +806,23 @@ impl Command {
                 crate::rack::remap_state(s, &map);
                 none
             }
-            Command::SetChannel { channel, name, color, volume, pan, pitch, enabled, track } => {
+            Command::SetChannel { channel, name, color, volume, pan, pitch, enabled, track, mono, porta, slide } => {
                 let track = track.map(|t| track_number(&s.project, t)).transpose()?;
                 let color = color.map(|c| parse_color(&c)).transpose()?;
                 let volume = volume.map(|v| unit("volume", v, 0.0, 1.0)).transpose()?;
                 let pan = pan.map(|v| unit("pan", v, -1.0, 1.0)).transpose()?;
+                let slide = slide.map(|v| unit("slide", v, 0.0, 1.0)).transpose()?;
                 let row = channel_row(&s.project, channel)?;
                 let ch = &mut s.project.channels[row];
+                if let Some(v) = mono {
+                    ch.misc.mono = v;
+                }
+                if let Some(v) = porta {
+                    ch.misc.porta = v;
+                }
+                if let Some(v) = slide {
+                    ch.misc.slide = v as f32;
+                }
                 if let Some(n) = name {
                     ch.name = text(&n);
                 }
